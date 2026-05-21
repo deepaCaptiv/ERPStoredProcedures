@@ -16,6 +16,21 @@ AS
 BEGIN
     SET NOCOUNT ON;
 
+	
+ INSERT INTO POJsonfromERP
+(
+    PONUMBER,
+    JsonData,
+    createdat
+)
+VALUES
+(
+    'Before SO Insert',
+    @JsonData,
+    GETDATE()
+);
+  
+  
     ------------------------------------------------------------
     -- 1. Parse JSON into table variable
     ------------------------------------------------------------
