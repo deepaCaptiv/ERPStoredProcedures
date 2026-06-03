@@ -1,4 +1,4 @@
-CREATE PROCEDURE [dbo].[saveasnheaderjson_new]  
+alter PROCEDURE [dbo].[saveasnheaderjson_new]  
     @jsondata NVARCHAR(MAX)  
 AS  
 BEGIN  
@@ -18,8 +18,10 @@ BEGIN
         DECLARE @tempasnheader TABLE  
         (  
             ASNId VARCHAR(36),  
-            ASNNubmer VARCHAR(50),  
-            Invoice_no VARCHAR(50),  
+            ASNNubmer VARCHAR(50),             
+     
+    --supp_Invoice_no VARCHAR(50),  
+    --erp_Invoice_no VARCHAR(50),  
             ShippingDate DATETIME,  
             ExpectedRecieptDate DATETIME,  
             ModeOfTransport INT,  
@@ -55,7 +57,7 @@ BEGIN
             DockerNo VARCHAR(100),  
   
             -- NEW FIELDS ADDED  
-            PoNumber VARCHAR(50),  
+            --PoNumber VARCHAR(50),  
             VendorName VARCHAR(200),  
             ShipToLocation VARCHAR(200),  
             NumOfContainers INT,  
@@ -71,7 +73,8 @@ BEGIN
         (  
             ASNId VARCHAR(36) '$.asn_id',  
             ASNNubmer VARCHAR(50) '$.asn_number',  
-            Invoice_no VARCHAR(50) '$.invoice_no',  
+   --         supp_invoice_no VARCHAR(50) '$.supp_invoice_no',  
+   --erp_invoice_no VARCHAR(50) '$.erp_invoice_no',  
   
             ShippingDate DATETIME '$.ship_date',  
             ExpectedRecieptDate DATETIME '$.expected_receipt_date',  
@@ -108,7 +111,7 @@ BEGIN
             DockerNo VARCHAR(100) '$.docker_no',  
   
             -- NEW JSON MAPPING  
-            PoNumber VARCHAR(50) '$.po_number',  
+           -- PoNumber VARCHAR(50) '$.po_number',  
             VendorName VARCHAR(200) '$.vendor_name',  
             ShipToLocation VARCHAR(200) '$.ship_to_location',  
             NumOfContainers INT '$.num_of_containers',  
@@ -121,8 +124,9 @@ BEGIN
   
         UPDATE tar  
         SET  
-            tar.ASNNubmer = src.ASNNubmer,  
-            tar.Invoice_no = src.Invoice_no,  
+   tar.ASNNubmer = src.ASNNubmer,  
+    --        tar.invoice_no = src.supp_invoice_no,  
+    --tar.erp_invoice_no = src.erp_invoice_no,  
             tar.ShippingDate = src.ShippingDate,  
             tar.ExpectedRecieptDate = src.ExpectedRecieptDate,  
             tar.ModeOfTransport = src.ModeOfTransport,  
@@ -158,7 +162,7 @@ BEGIN
             tar.DockerNo = src.DockerNo,  
   
             -- NEW UPDATE FIELDS  
-            tar.PoNumber = src.PoNumber,  
+           -- tar.PoNumber = src.PoNumber,  
             tar.VendorName = src.VendorName,  
             tar.ShipToLocation = src.ShipToLocation,  
             tar.NumOfContainers = src.NumOfContainers,  
@@ -178,7 +182,8 @@ BEGIN
         (  
             ASNId,  
             ASNNubmer,  
-            Invoice_no,  
+   --         Invoice_no,  
+   --erp_invoice_no,  
             ShippingDate,  
             ExpectedRecieptDate,  
             ModeOfTransport,  
@@ -214,7 +219,7 @@ BEGIN
             DockerNo,  
   
             -- NEW INSERT FIELDS  
-            ponumber,  
+           -- ponumber,  
             VendorName,  
             ShipToLocation,  
             NumOfContainers,  
@@ -225,7 +230,8 @@ BEGIN
         SELECT  
             t.ASNId,  
             t.ASNNubmer,  
-            t.Invoice_no,  
+   --         t.supp_Invoice_no,  
+   --t.erp_Invoice_no,  
             t.ShippingDate,  
             t.ExpectedRecieptDate,  
             t.ModeOfTransport,  
@@ -251,7 +257,7 @@ BEGIN
             t.CourierNo,  
             t.TrackingNo,  
             t.DockerNo,  
-            t.PoNumber,  
+           -- t.PoNumber,  
             t.VendorName,  
             t.ShipToLocation,  
             t.NumOfContainers,  
@@ -284,3 +290,7 @@ BEGIN
             ERROR_LINE() AS errorline;  
     END CATCH  
 END;  
+  
+  
+    
+  
