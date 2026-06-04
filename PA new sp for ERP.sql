@@ -1,4 +1,4 @@
-  alter    PROCEDURE [dbo].[upsertpaymentadvices]      
+  CREATE   PROCEDURE [dbo].[upsertpaymentadvices]      
     @jsondata NVARCHAR(MAX)      
 AS      
 BEGIN      
@@ -177,7 +177,7 @@ BEGIN
         UPDATE tar      
         SET      
             tar.payment_invoice_id =  src.invoice_id,    
-            tar.payment_id = src.record_id,      
+          --  tar.payment_id = src.record_id,      
             tar.accounting_date = src.invoice_date,      
             tar.invoice_number = src.invoice_num,      
             tar.invoice_id = src.invoice_id,      
@@ -196,12 +196,12 @@ BEGIN
         SET      
             tar.Payment_POHeaderId = src.po_header_id,      
             tar.PO_Number = src.po_number,      
-            tar.Payment_Id = src.record_id,      
+            --tar.Payment_Id = src.record_id,      
             tar.updated_by = src.updated_by,      
             tar.updated_on = COALESCE(src.updated_at, GETDATE())      
         FROM PaymentPOHeaderMapping tar      
         INNER JOIN @tempheader src      
-            ON tar.check_id = src.check_id AND tar.PO_Number=src.po_number     
+            ON tar.check_id = src.check_id AND tar.PO_Number=src.po_number      
       
       
      -------------------------------------------------------------      
@@ -211,7 +211,7 @@ BEGIN
         SET      
             tar.Payment_ASNId = src.shipment_header_id,      
             tar.receipt_num = src.receipt_num,      
-            tar.Payment_Id = src.record_id,      
+          --  tar.Payment_Id = src.record_id,      
             tar.updated_by = src.updated_by,      
             tar.updated_on = COALESCE(src.updated_at, GETDATE())      
         FROM PaymentASNMapping tar      
@@ -318,7 +318,7 @@ BEGIN
             record_id,      
             updated_by,      
             COALESCE(updated_at, GETDATE())      
-        FROM @tempheader src      
+   FROM @tempheader src      
         WHERE NOT EXISTS (      
             SELECT 1 FROM PaymentPOHeaderMapping p WHERE p.po_number = src.po_number  AND p.check_id=src.check_id     
         );      
