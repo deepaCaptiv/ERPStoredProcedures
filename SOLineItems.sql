@@ -1,381 +1,357 @@
-USE [Vertiv]
-GO
-
-/****** Object:  StoredProcedure [dbo].[SaveSOLineItemsJson]    Script Date: 05-05-2026 11:05:41 ******/
-SET ANSI_NULLS ON
-GO
-
-SET QUOTED_IDENTIFIER ON
-GO
-
-CREATE PROCEDURE [dbo].[SaveSOLineItemsJson]
-(
-    @JsonData NVARCHAR(MAX)
-)
-AS
-BEGIN
-    SET NOCOUNT ON;
-
-	
- INSERT INTO POJsonfromERP
-(
-    PONUMBER,
-    JsonData,
-    createdat
-)
-VALUES
-(
-    'Before SO Insert',
-    @JsonData,
-    GETDATE()
-);
-  
-  
-    ------------------------------------------------------------
-    -- 1. Parse JSON into table variable
-    ------------------------------------------------------------
-    DECLARE @SOLines TABLE
-    (
-        SOERPLineItemId VARCHAR(36),
-        SOERPHeaderId VARCHAR(36),
-        LINE_NUM INT,
-        SHIPMENT_NUM INT,
-
-        ITEM_CODE VARCHAR(50),
-        ITEM_ID BIGINT,
-        ITEM_DESC NVARCHAR(1000),
-        ITEM_CATEGORY VARCHAR(100),
-        HSN_SAC_CODE VARCHAR(20),
-        SERIAL_NUMBER_CONTROL VARCHAR(10),
-        LOT_CONTROL VARCHAR(10),
-
-        ORDERED_QTY DECIMAL(18,2),
-        SHIPPED_QTY DECIMAL(18,2),
-        CANCELLED_QTY DECIMAL(18,2),
-        FULFILLED_QTY DECIMAL(18,2),
-
-        UOM VARCHAR(10),
-        SECONDARY_UOM VARCHAR(10),
-
-        UNIT_LIST_PRICE DECIMAL(18,2),
-        UNIT_SELLING_PRICE DECIMAL(18,2),
-        DISCOUNT_PERCENT DECIMAL(5,2),
-        DISCOUNT_AMOUNT DECIMAL(18,2),
-        LINE_AMOUNT DECIMAL(18,2),
-        LINE_TAX_AMOUNT DECIMAL(18,2),
-
-        REQUEST_DATE DATETIME,
-        PROMISE_DATE DATETIME,
-        SCHEDULE_SHIP_DATE DATETIME,
-        ACTUAL_SHIP_DATE DATETIME,
-
-        LINE_STATUS VARCHAR(50),
-        BACKORDER_FLAG BIT,
-        DROP_SHIP_FLAG BIT,
-        SHIPPABLE_FLAG BIT,
-        INVOICEABLE_FLAG BIT,
-
-        TAX_RATE DECIMAL(5,2),
-        CGST_RATE DECIMAL(5,2),
-        SGST_RATE DECIMAL(5,2),
-        IGST_RATE DECIMAL(5,2),
-        CESS_RATE DECIMAL(5,2),
-
-        GST_EXEMPTION_FLAG BIT,
-        PLACE_OF_SUPPLY VARCHAR(50),
-        EXPORT_FLAG BIT,
-
-        WAREHOUSE_ID BIGINT,
-        WAREHOUSE_CODE VARCHAR(50),
-        SUBINVENTORY VARCHAR(30),
-        RESERVATION_STATUS VARCHAR(50),
-
-        ITEM_TYPE_CODE VARCHAR(30),
-        LINE_TYPE_ID BIGINT,
-
-        SHIP_FROM_ORG_ID BIGINT,
-        SHIP_FROM_LOCATION VARCHAR(200),
-        SHIP_FROM_COUNTRY NVARCHAR(200),
-
-        SHIP_TO_ORG_ID BIGINT,
-        SHIP_TO_LOCATION VARCHAR(200),
-        SHIP_TO_ADDRESS NVARCHAR(1000),
-        SHIP_TO_COUNTRY NVARCHAR(200),
-
-        LINE_TYPE VARCHAR(50),
-        LINE_SERVICE_TYPE VARCHAR(100),
-        LINE_TRANSACTION_TYPE VARCHAR(100),
-        LINE_TAX_TREATMENT VARCHAR(50),
-
-        REQUIRES_EXPORT_DOCS BIT,
-        REQUIRES_IC_DOCS BIT,
-        REQUIRES_SHIPPING_DOCS BIT,
-
-        SERVICE_DURATION INT,
-        SERVICE_START_DATE DATETIME,
-        SERVICE_END_DATE DATETIME,
-        SERVICE_REFERENCE_TYPE VARCHAR(50),
-        SERVICE_REFERENCE_ID BIGINT,
-
-        created_by BIGINT,
-        created_at DATETIME,
-        updated_by BIGINT,
-        updated_at DATETIME
-    );
-
-    INSERT INTO @SOLines
-    SELECT *
-    FROM OPENJSON(@JsonData)
-    WITH (
-        SOERPLineItemId VARCHAR(36),
-        SOERPHeaderId VARCHAR(36),
-        LINE_NUM INT,
-        SHIPMENT_NUM INT,
-
-        ITEM_CODE VARCHAR(50),
-        ITEM_ID BIGINT,
-        ITEM_DESC NVARCHAR(1000),
-        ITEM_CATEGORY VARCHAR(100),
-        HSN_SAC_CODE VARCHAR(20),
-        SERIAL_NUMBER_CONTROL VARCHAR(10),
-        LOT_CONTROL VARCHAR(10),
-
-        ORDERED_QTY DECIMAL(18,2),
-        SHIPPED_QTY DECIMAL(18,2),
-        CANCELLED_QTY DECIMAL(18,2),
-        FULFILLED_QTY DECIMAL(18,2),
-
-        UOM VARCHAR(10),
-        SECONDARY_UOM VARCHAR(10),
-
-        UNIT_LIST_PRICE DECIMAL(18,2),
-        UNIT_SELLING_PRICE DECIMAL(18,2),
-        DISCOUNT_PERCENT DECIMAL(5,2),
-        DISCOUNT_AMOUNT DECIMAL(18,2),
-        LINE_AMOUNT DECIMAL(18,2),
-        LINE_TAX_AMOUNT DECIMAL(18,2),
-
-        REQUEST_DATE DATETIME,
-        PROMISE_DATE DATETIME,
-        SCHEDULE_SHIP_DATE DATETIME,
-        ACTUAL_SHIP_DATE DATETIME,
-
-        LINE_STATUS VARCHAR(50),
-        BACKORDER_FLAG BIT,
-        DROP_SHIP_FLAG BIT,
-        SHIPPABLE_FLAG BIT,
-        INVOICEABLE_FLAG BIT,
-
-        TAX_RATE DECIMAL(5,2),
-        CGST_RATE DECIMAL(5,2),
-        SGST_RATE DECIMAL(5,2),
-        IGST_RATE DECIMAL(5,2),
-        CESS_RATE DECIMAL(5,2),
-
-        GST_EXEMPTION_FLAG BIT,
-        PLACE_OF_SUPPLY VARCHAR(50),
-        EXPORT_FLAG BIT,
-
-        WAREHOUSE_ID BIGINT,
-        WAREHOUSE_CODE VARCHAR(50),
-        SUBINVENTORY VARCHAR(30),
-        RESERVATION_STATUS VARCHAR(50),
-
-        ITEM_TYPE_CODE VARCHAR(30),
-        LINE_TYPE_ID BIGINT,
-
-        SHIP_FROM_ORG_ID BIGINT,
-        SHIP_FROM_LOCATION VARCHAR(200),
-        SHIP_FROM_COUNTRY NVARCHAR(200),
-
-        SHIP_TO_ORG_ID BIGINT,
-        SHIP_TO_LOCATION VARCHAR(200),
-        SHIP_TO_ADDRESS NVARCHAR(1000),
-        SHIP_TO_COUNTRY NVARCHAR(200),
-
-        LINE_TYPE VARCHAR(50),
-        LINE_SERVICE_TYPE VARCHAR(100),
-        LINE_TRANSACTION_TYPE VARCHAR(100),
-        LINE_TAX_TREATMENT VARCHAR(50),
-
-        REQUIRES_EXPORT_DOCS BIT,
-        REQUIRES_IC_DOCS BIT,
-        REQUIRES_SHIPPING_DOCS BIT,
-
-        SERVICE_DURATION INT,
-        SERVICE_START_DATE DATETIME,
-        SERVICE_END_DATE DATETIME,
-        SERVICE_REFERENCE_TYPE VARCHAR(50),
-        SERVICE_REFERENCE_ID BIGINT,
-
-        created_by BIGINT,
-        created_at DATETIME,
-        updated_by BIGINT,
-        updated_at DATETIME
-    );
-
-    ------------------------------------------------------------
-    -- 2. UPDATE
-    ------------------------------------------------------------
-    UPDATE tgt
-    SET 
-        tgt.SOERPHeaderId = src.SOERPHeaderId,
-        tgt.LINE_NUM = src.LINE_NUM,
-        tgt.SHIPMENT_NUM = ISNULL(src.SHIPMENT_NUM, tgt.SHIPMENT_NUM),
-
-        tgt.ITEM_CODE = src.ITEM_CODE,
-        tgt.ITEM_ID = src.ITEM_ID,
-        tgt.ITEM_DESC = src.ITEM_DESC,
-        tgt.ITEM_CATEGORY = src.ITEM_CATEGORY,
-        tgt.HSN_SAC_CODE = src.HSN_SAC_CODE,
-        tgt.SERIAL_NUMBER_CONTROL = src.SERIAL_NUMBER_CONTROL,
-        tgt.LOT_CONTROL = src.LOT_CONTROL,
-
-        tgt.ORDERED_QTY = src.ORDERED_QTY,
-        tgt.SHIPPED_QTY = src.SHIPPED_QTY,
-        tgt.CANCELLED_QTY = src.CANCELLED_QTY,
-        tgt.FULFILLED_QTY = src.FULFILLED_QTY,
-
-        tgt.UOM = src.UOM,
-        tgt.SECONDARY_UOM = src.SECONDARY_UOM,
-
-        tgt.UNIT_LIST_PRICE = src.UNIT_LIST_PRICE,
-        tgt.UNIT_SELLING_PRICE = src.UNIT_SELLING_PRICE,
-        tgt.DISCOUNT_PERCENT = src.DISCOUNT_PERCENT,
-        tgt.DISCOUNT_AMOUNT = src.DISCOUNT_AMOUNT,
-        tgt.LINE_AMOUNT = src.LINE_AMOUNT,
-        tgt.LINE_TAX_AMOUNT = src.LINE_TAX_AMOUNT,
-
-        tgt.REQUEST_DATE = src.REQUEST_DATE,
-        tgt.PROMISE_DATE = src.PROMISE_DATE,
-        tgt.SCHEDULE_SHIP_DATE = src.SCHEDULE_SHIP_DATE,
-        tgt.ACTUAL_SHIP_DATE = src.ACTUAL_SHIP_DATE,
-
-        tgt.LINE_STATUS = src.LINE_STATUS,
-        tgt.BACKORDER_FLAG = src.BACKORDER_FLAG,
-        tgt.DROP_SHIP_FLAG = src.DROP_SHIP_FLAG,
-        tgt.SHIPPABLE_FLAG = src.SHIPPABLE_FLAG,
-        tgt.INVOICEABLE_FLAG = src.INVOICEABLE_FLAG,
-
-        tgt.TAX_RATE = src.TAX_RATE,
-        tgt.CGST_RATE = src.CGST_RATE,
-        tgt.SGST_RATE = src.SGST_RATE,
-        tgt.IGST_RATE = src.IGST_RATE,
-        tgt.CESS_RATE = src.CESS_RATE,
-
-        tgt.GST_EXEMPTION_FLAG = src.GST_EXEMPTION_FLAG,
-        tgt.PLACE_OF_SUPPLY = src.PLACE_OF_SUPPLY,
-        tgt.EXPORT_FLAG = src.EXPORT_FLAG,
-
-        tgt.WAREHOUSE_ID = src.WAREHOUSE_ID,
-        tgt.WAREHOUSE_CODE = src.WAREHOUSE_CODE,
-        tgt.SUBINVENTORY = src.SUBINVENTORY,
-        tgt.RESERVATION_STATUS = src.RESERVATION_STATUS,
-
-        tgt.ITEM_TYPE_CODE = src.ITEM_TYPE_CODE,
-        tgt.LINE_TYPE_ID = src.LINE_TYPE_ID,
-
-        tgt.SHIP_FROM_ORG_ID = src.SHIP_FROM_ORG_ID,
-        tgt.SHIP_FROM_LOCATION = src.SHIP_FROM_LOCATION,
-        tgt.SHIP_FROM_COUNTRY = src.SHIP_FROM_COUNTRY,
-
-        tgt.SHIP_TO_ORG_ID = src.SHIP_TO_ORG_ID,
-        tgt.SHIP_TO_LOCATION = src.SHIP_TO_LOCATION,
-        tgt.SHIP_TO_ADDRESS = src.SHIP_TO_ADDRESS,
-        tgt.SHIP_TO_COUNTRY = src.SHIP_TO_COUNTRY,
-
-        tgt.LINE_TYPE = src.LINE_TYPE,
-        tgt.LINE_SERVICE_TYPE = src.LINE_SERVICE_TYPE,
-        tgt.LINE_TRANSACTION_TYPE = src.LINE_TRANSACTION_TYPE,
-        tgt.LINE_TAX_TREATMENT = src.LINE_TAX_TREATMENT,
-
-        tgt.REQUIRES_EXPORT_DOCS = src.REQUIRES_EXPORT_DOCS,
-        tgt.REQUIRES_IC_DOCS = src.REQUIRES_IC_DOCS,
-        tgt.REQUIRES_SHIPPING_DOCS = src.REQUIRES_SHIPPING_DOCS,
-
-        tgt.SERVICE_DURATION = src.SERVICE_DURATION,
-        tgt.SERVICE_START_DATE = src.SERVICE_START_DATE,
-        tgt.SERVICE_END_DATE = src.SERVICE_END_DATE,
-        tgt.SERVICE_REFERENCE_TYPE = src.SERVICE_REFERENCE_TYPE,
-        tgt.SERVICE_REFERENCE_ID = src.SERVICE_REFERENCE_ID,
-
-        tgt.updated_by = src.updated_by,
-        tgt.updated_at = GETDATE()
-    FROM SOERPLineItems tgt
-    JOIN @SOLines src
-        ON tgt.SOERPLineItemId = src.SOERPLineItemId;
-
-    ------------------------------------------------------------
-    -- 3. INSERT
-    ------------------------------------------------------------
-    INSERT INTO SOERPLineItems
-    (
-        SOERPLineItemId, SOERPHeaderId, LINE_NUM, SHIPMENT_NUM,
-        ITEM_CODE, ITEM_ID, ITEM_DESC, ITEM_CATEGORY, HSN_SAC_CODE,
-        SERIAL_NUMBER_CONTROL, LOT_CONTROL,
-        ORDERED_QTY, SHIPPED_QTY, CANCELLED_QTY, FULFILLED_QTY,
-        UOM, SECONDARY_UOM,
-        UNIT_LIST_PRICE, UNIT_SELLING_PRICE, DISCOUNT_PERCENT, DISCOUNT_AMOUNT,
-        LINE_AMOUNT, LINE_TAX_AMOUNT,
-        REQUEST_DATE, PROMISE_DATE, SCHEDULE_SHIP_DATE, ACTUAL_SHIP_DATE,
-        LINE_STATUS, BACKORDER_FLAG, DROP_SHIP_FLAG, SHIPPABLE_FLAG, INVOICEABLE_FLAG,
-        TAX_RATE, CGST_RATE, SGST_RATE, IGST_RATE, CESS_RATE,
-        GST_EXEMPTION_FLAG, PLACE_OF_SUPPLY, EXPORT_FLAG,
-        WAREHOUSE_ID, WAREHOUSE_CODE, SUBINVENTORY, RESERVATION_STATUS,
-        ITEM_TYPE_CODE, LINE_TYPE_ID,
-        SHIP_FROM_ORG_ID, SHIP_FROM_LOCATION, SHIP_FROM_COUNTRY,
-        SHIP_TO_ORG_ID, SHIP_TO_LOCATION, SHIP_TO_ADDRESS, SHIP_TO_COUNTRY,
-        LINE_TYPE, LINE_SERVICE_TYPE, LINE_TRANSACTION_TYPE, LINE_TAX_TREATMENT,
-        REQUIRES_EXPORT_DOCS, REQUIRES_IC_DOCS, REQUIRES_SHIPPING_DOCS,
-        SERVICE_DURATION, SERVICE_START_DATE, SERVICE_END_DATE,
-        SERVICE_REFERENCE_TYPE, SERVICE_REFERENCE_ID,
-        created_by, created_at, updated_by, updated_at
-    )
-    SELECT
-        ISNULL(src.SOERPLineItemId, CONVERT(VARCHAR(36), NEWID())),
-        src.SOERPHeaderId,
-        src.LINE_NUM,
-        ISNULL(src.SHIPMENT_NUM,1),
-
-        src.ITEM_CODE, src.ITEM_ID, src.ITEM_DESC, src.ITEM_CATEGORY, src.HSN_SAC_CODE,
-        src.SERIAL_NUMBER_CONTROL, src.LOT_CONTROL,
-        src.ORDERED_QTY, src.SHIPPED_QTY, src.CANCELLED_QTY, src.FULFILLED_QTY,
-        src.UOM, src.SECONDARY_UOM,
-        src.UNIT_LIST_PRICE, src.UNIT_SELLING_PRICE, src.DISCOUNT_PERCENT, src.DISCOUNT_AMOUNT,
-        src.LINE_AMOUNT, src.LINE_TAX_AMOUNT,
-        src.REQUEST_DATE, src.PROMISE_DATE, src.SCHEDULE_SHIP_DATE, src.ACTUAL_SHIP_DATE,
-        src.LINE_STATUS, src.BACKORDER_FLAG, src.DROP_SHIP_FLAG, src.SHIPPABLE_FLAG, src.INVOICEABLE_FLAG,
-        src.TAX_RATE, src.CGST_RATE, src.SGST_RATE, src.IGST_RATE, src.CESS_RATE,
-        src.GST_EXEMPTION_FLAG, src.PLACE_OF_SUPPLY, src.EXPORT_FLAG,
-        src.WAREHOUSE_ID, src.WAREHOUSE_CODE, src.SUBINVENTORY, src.RESERVATION_STATUS,
-        src.ITEM_TYPE_CODE, src.LINE_TYPE_ID,
-        src.SHIP_FROM_ORG_ID, src.SHIP_FROM_LOCATION, src.SHIP_FROM_COUNTRY,
-        src.SHIP_TO_ORG_ID, src.SHIP_TO_LOCATION, src.SHIP_TO_ADDRESS, src.SHIP_TO_COUNTRY,
-        src.LINE_TYPE, src.LINE_SERVICE_TYPE, src.LINE_TRANSACTION_TYPE, src.LINE_TAX_TREATMENT,
-        src.REQUIRES_EXPORT_DOCS, src.REQUIRES_IC_DOCS, src.REQUIRES_SHIPPING_DOCS,
-        src.SERVICE_DURATION, src.SERVICE_START_DATE, src.SERVICE_END_DATE,
-        src.SERVICE_REFERENCE_TYPE, src.SERVICE_REFERENCE_ID,
-        src.created_by, ISNULL(src.created_at,GETDATE()), src.updated_by, src.updated_at
-    FROM @SOLines src
-    WHERE NOT EXISTS (
-        SELECT 1 FROM SOERPLineItems tgt WHERE tgt.SOERPLineItemId = src.SOERPLineItemId
-    );
-
-    ------------------------------------------------------------
-    -- Logging
-    ------------------------------------------------------------
-    DECLARE @SO_Number VARCHAR(50);
-
-    SELECT TOP 1 @SO_Number = SEH.SO_NUMBER
-    FROM SOERPHeader SEH
-    JOIN @SOLines SL ON SL.SOERPHeaderId = SEH.SOERPHeaderId;
-
-    INSERT INTO POJsonfromERP
-    SELECT CONCAT('SO-LINE-ITEMS-', @SO_Number), @JsonData, GETDATE();
-
-    SELECT 'SUCCESS' AS Status, 'Line items upserted successfully' AS Message;
-
-END
-GO
-
-
+ CREATE   PROCEDURE [dbo].[SaveSOLineItemsJson]    
+(    
+    @JsonData NVARCHAR(MAX)    
+)    
+AS    
+BEGIN    
+    SET NOCOUNT ON;    
+    
+    ------------------------------------------------------------    
+    -- 1. Parse JSON into table variable    
+    ------------------------------------------------------------    
+   
+ INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Line Items Insert',     @JsonData,     GETDATE() );  
+    
+    
+    DECLARE @SOLines TABLE    
+    (    
+        SOERPLineItemId VARCHAR(36),    
+        SOERPHeaderId VARCHAR(36),    
+        LINE_NUM INT,    
+        SHIPMENT_NUM INT,    
+    
+        ITEM_CODE VARCHAR(50),    
+        ITEM_ID BIGINT,    
+        ITEM_DESC NVARCHAR(1000),    
+        ITEM_CATEGORY VARCHAR(100),    
+        HSN_SAC_CODE VARCHAR(20),    
+        SERIAL_NUMBER_CONTROL VARCHAR(10),    
+        LOT_CONTROL VARCHAR(10),    
+    
+        ORDERED_QTY DECIMAL(18,2),    
+        SHIPPED_QTY DECIMAL(18,2),    
+        CANCELLED_QTY DECIMAL(18,2),    
+        FULFILLED_QTY DECIMAL(18,2),    
+    
+        UOM VARCHAR(10),    
+        SECONDARY_UOM VARCHAR(10),    
+    
+        UNIT_LIST_PRICE DECIMAL(18,2),    
+        UNIT_SELLING_PRICE DECIMAL(18,2),    
+        DISCOUNT_PERCENT DECIMAL(5,2),    
+        DISCOUNT_AMOUNT DECIMAL(18,2),    
+        LINE_AMOUNT DECIMAL(18,2),    
+        LINE_TAX_AMOUNT DECIMAL(18,2),    
+    
+        REQUEST_DATE DATETIME,    
+        PROMISE_DATE DATETIME,    
+        SCHEDULE_SHIP_DATE DATETIME,    
+        ACTUAL_SHIP_DATE DATETIME,    
+    
+        LINE_STATUS VARCHAR(50),    
+        BACKORDER_FLAG BIT,    
+        DROP_SHIP_FLAG BIT,    
+        SHIPPABLE_FLAG BIT,    
+        INVOICEABLE_FLAG BIT,    
+    
+        TAX_RATE DECIMAL(5,2),    
+        CGST_RATE DECIMAL(5,2),    
+        SGST_RATE DECIMAL(5,2),    
+        IGST_RATE DECIMAL(5,2),    
+        CESS_RATE DECIMAL(5,2),    
+    
+        GST_EXEMPTION_FLAG BIT,    
+        PLACE_OF_SUPPLY VARCHAR(50),    
+        EXPORT_FLAG BIT,    
+    
+        WAREHOUSE_ID BIGINT,    
+        WAREHOUSE_CODE VARCHAR(50),    
+        SUBINVENTORY VARCHAR(30),    
+        RESERVATION_STATUS VARCHAR(50),    
+    
+        ITEM_TYPE_CODE VARCHAR(30),    
+        LINE_TYPE_ID BIGINT,    
+    
+        SHIP_FROM_ORG_ID BIGINT,    
+        SHIP_FROM_LOCATION VARCHAR(200),    
+        SHIP_FROM_COUNTRY NVARCHAR(200),    
+    
+        SHIP_TO_ORG_ID BIGINT,    
+        SHIP_TO_LOCATION VARCHAR(200),    
+        SHIP_TO_ADDRESS NVARCHAR(1000),    
+        SHIP_TO_COUNTRY NVARCHAR(200),    
+    
+        LINE_TYPE VARCHAR(50),    
+        LINE_SERVICE_TYPE VARCHAR(100),    
+        LINE_TRANSACTION_TYPE VARCHAR(100),    
+        LINE_TAX_TREATMENT VARCHAR(50),    
+    
+        REQUIRES_EXPORT_DOCS BIT,    
+        REQUIRES_IC_DOCS BIT,    
+        REQUIRES_SHIPPING_DOCS BIT,    
+    
+        SERVICE_DURATION INT,    
+        SERVICE_START_DATE DATETIME,    
+        SERVICE_END_DATE DATETIME,    
+        SERVICE_REFERENCE_TYPE VARCHAR(50),    
+        SERVICE_REFERENCE_ID BIGINT,    
+    
+        created_by BIGINT,    
+        created_at DATETIME,    
+        updated_by BIGINT,    
+        updated_at DATETIME    
+    );    
+    
+    INSERT INTO @SOLines    
+    SELECT *    
+    FROM OPENJSON(@JsonData)    
+    WITH (    
+        SOERPLineItemId VARCHAR(36),    
+        SOERPHeaderId VARCHAR(36),    
+        LINE_NUM INT,    
+        SHIPMENT_NUM INT,    
+    
+        ITEM_CODE VARCHAR(50),    
+        ITEM_ID BIGINT,    
+        ITEM_DESC NVARCHAR(1000),    
+        ITEM_CATEGORY VARCHAR(100),    
+        HSN_SAC_CODE VARCHAR(20),    
+        SERIAL_NUMBER_CONTROL VARCHAR(10),    
+        LOT_CONTROL VARCHAR(10),    
+    
+        ORDERED_QTY DECIMAL(18,2),    
+        SHIPPED_QTY DECIMAL(18,2),    
+        CANCELLED_QTY DECIMAL(18,2),    
+        FULFILLED_QTY DECIMAL(18,2),    
+    
+        UOM VARCHAR(10),    
+        SECONDARY_UOM VARCHAR(10),    
+    
+        UNIT_LIST_PRICE DECIMAL(18,2),    
+        UNIT_SELLING_PRICE DECIMAL(18,2),    
+        DISCOUNT_PERCENT DECIMAL(5,2),    
+        DISCOUNT_AMOUNT DECIMAL(18,2),    
+        LINE_AMOUNT DECIMAL(18,2),    
+        LINE_TAX_AMOUNT DECIMAL(18,2),    
+    
+        REQUEST_DATE DATETIME,    
+        PROMISE_DATE DATETIME,    
+        SCHEDULE_SHIP_DATE DATETIME,    
+        ACTUAL_SHIP_DATE DATETIME,    
+    
+        LINE_STATUS VARCHAR(50),    
+        BACKORDER_FLAG BIT,    
+        DROP_SHIP_FLAG BIT,    
+        SHIPPABLE_FLAG BIT,    
+        INVOICEABLE_FLAG BIT,    
+    
+        TAX_RATE DECIMAL(5,2),    
+        CGST_RATE DECIMAL(5,2),    
+        SGST_RATE DECIMAL(5,2),    
+        IGST_RATE DECIMAL(5,2),    
+        CESS_RATE DECIMAL(5,2),    
+    
+        GST_EXEMPTION_FLAG BIT,    
+        PLACE_OF_SUPPLY VARCHAR(50),    
+        EXPORT_FLAG BIT,    
+    
+        WAREHOUSE_ID BIGINT,    
+        WAREHOUSE_CODE VARCHAR(50),    
+        SUBINVENTORY VARCHAR(30),    
+        RESERVATION_STATUS VARCHAR(50),    
+    
+        ITEM_TYPE_CODE VARCHAR(30),    
+        LINE_TYPE_ID BIGINT,    
+    
+        SHIP_FROM_ORG_ID BIGINT,    
+        SHIP_FROM_LOCATION VARCHAR(200),    
+        SHIP_FROM_COUNTRY NVARCHAR(200),    
+    
+        SHIP_TO_ORG_ID BIGINT,    
+        SHIP_TO_LOCATION VARCHAR(200),    
+        SHIP_TO_ADDRESS NVARCHAR(1000),    
+        SHIP_TO_COUNTRY NVARCHAR(200),    
+    
+        LINE_TYPE VARCHAR(50),    
+        LINE_SERVICE_TYPE VARCHAR(100),    
+        LINE_TRANSACTION_TYPE VARCHAR(100),    
+        LINE_TAX_TREATMENT VARCHAR(50),    
+    
+        REQUIRES_EXPORT_DOCS BIT,    
+        REQUIRES_IC_DOCS BIT,    
+        REQUIRES_SHIPPING_DOCS BIT,    
+    
+        SERVICE_DURATION INT,    
+        SERVICE_START_DATE DATETIME,    
+        SERVICE_END_DATE DATETIME,    
+        SERVICE_REFERENCE_TYPE VARCHAR(50),    
+        SERVICE_REFERENCE_ID BIGINT,    
+    
+        created_by BIGINT,    
+        created_at DATETIME,    
+        updated_by BIGINT,    
+        updated_at DATETIME    
+    );    
+    
+    ------------------------------------------------------------    
+    -- 2. UPDATE    
+    ------------------------------------------------------------    
+    UPDATE tgt    
+    SET     
+        tgt.SOERPHeaderId = src.SOERPHeaderId,    
+        tgt.LINE_NUM = src.LINE_NUM,    
+        tgt.SHIPMENT_NUM = ISNULL(src.SHIPMENT_NUM, tgt.SHIPMENT_NUM),    
+    
+        tgt.ITEM_CODE = src.ITEM_CODE,    
+        tgt.ITEM_ID = src.ITEM_ID,    
+        tgt.ITEM_DESC = src.ITEM_DESC,    
+        tgt.ITEM_CATEGORY = src.ITEM_CATEGORY,    
+        tgt.HSN_SAC_CODE = src.HSN_SAC_CODE,    
+        tgt.SERIAL_NUMBER_CONTROL = src.SERIAL_NUMBER_CONTROL,    
+        tgt.LOT_CONTROL = src.LOT_CONTROL,    
+    
+        tgt.ORDERED_QTY = src.ORDERED_QTY,    
+        tgt.SHIPPED_QTY = src.SHIPPED_QTY,    
+        tgt.CANCELLED_QTY = src.CANCELLED_QTY,    
+        tgt.FULFILLED_QTY = src.FULFILLED_QTY,    
+    
+        tgt.UOM = src.UOM,    
+        tgt.SECONDARY_UOM = src.SECONDARY_UOM,    
+    
+        tgt.UNIT_LIST_PRICE = src.UNIT_LIST_PRICE,    
+        tgt.UNIT_SELLING_PRICE = src.UNIT_SELLING_PRICE,    
+        tgt.DISCOUNT_PERCENT = src.DISCOUNT_PERCENT,    
+        tgt.DISCOUNT_AMOUNT = src.DISCOUNT_AMOUNT,    
+        tgt.LINE_AMOUNT = src.LINE_AMOUNT,    
+        tgt.LINE_TAX_AMOUNT = src.LINE_TAX_AMOUNT,    
+    
+        tgt.REQUEST_DATE = src.REQUEST_DATE,    
+        tgt.PROMISE_DATE = src.PROMISE_DATE,    
+        tgt.SCHEDULE_SHIP_DATE = src.SCHEDULE_SHIP_DATE,    
+        tgt.ACTUAL_SHIP_DATE = src.ACTUAL_SHIP_DATE,    
+    
+        tgt.LINE_STATUS = src.LINE_STATUS,    
+        tgt.BACKORDER_FLAG = src.BACKORDER_FLAG,    
+        tgt.DROP_SHIP_FLAG = src.DROP_SHIP_FLAG,    
+        tgt.SHIPPABLE_FLAG = src.SHIPPABLE_FLAG,    
+        tgt.INVOICEABLE_FLAG = src.INVOICEABLE_FLAG,    
+    
+        tgt.TAX_RATE = src.TAX_RATE,    
+        tgt.CGST_RATE = src.CGST_RATE,    
+        tgt.SGST_RATE = src.SGST_RATE,    
+        tgt.IGST_RATE = src.IGST_RATE,    
+        tgt.CESS_RATE = src.CESS_RATE,    
+    
+        tgt.GST_EXEMPTION_FLAG = src.GST_EXEMPTION_FLAG,    
+        tgt.PLACE_OF_SUPPLY = src.PLACE_OF_SUPPLY,    
+        tgt.EXPORT_FLAG = src.EXPORT_FLAG,    
+    
+        tgt.WAREHOUSE_ID = src.WAREHOUSE_ID,    
+        tgt.WAREHOUSE_CODE = src.WAREHOUSE_CODE,    
+        tgt.SUBINVENTORY = src.SUBINVENTORY,    
+        tgt.RESERVATION_STATUS = src.RESERVATION_STATUS,    
+    
+        tgt.ITEM_TYPE_CODE = src.ITEM_TYPE_CODE,    
+        tgt.LINE_TYPE_ID = src.LINE_TYPE_ID,    
+    
+        tgt.SHIP_FROM_ORG_ID = src.SHIP_FROM_ORG_ID,    
+        tgt.SHIP_FROM_LOCATION = src.SHIP_FROM_LOCATION,    
+        tgt.SHIP_FROM_COUNTRY = src.SHIP_FROM_COUNTRY,    
+    
+        tgt.SHIP_TO_ORG_ID = src.SHIP_TO_ORG_ID,    
+        tgt.SHIP_TO_LOCATION = src.SHIP_TO_LOCATION,    
+        tgt.SHIP_TO_ADDRESS = src.SHIP_TO_ADDRESS,    
+        tgt.SHIP_TO_COUNTRY = src.SHIP_TO_COUNTRY,    
+    
+        tgt.LINE_TYPE = src.LINE_TYPE,    
+        tgt.LINE_SERVICE_TYPE = src.LINE_SERVICE_TYPE,    
+        tgt.LINE_TRANSACTION_TYPE = src.LINE_TRANSACTION_TYPE,    
+        tgt.LINE_TAX_TREATMENT = src.LINE_TAX_TREATMENT,    
+    
+        tgt.REQUIRES_EXPORT_DOCS = src.REQUIRES_EXPORT_DOCS,    
+        tgt.REQUIRES_IC_DOCS = src.REQUIRES_IC_DOCS,    
+        tgt.REQUIRES_SHIPPING_DOCS = src.REQUIRES_SHIPPING_DOCS,    
+    
+        tgt.SERVICE_DURATION = src.SERVICE_DURATION,    
+        tgt.SERVICE_START_DATE = src.SERVICE_START_DATE,    
+        tgt.SERVICE_END_DATE = src.SERVICE_END_DATE,    
+        tgt.SERVICE_REFERENCE_TYPE = src.SERVICE_REFERENCE_TYPE,    
+        tgt.SERVICE_REFERENCE_ID = src.SERVICE_REFERENCE_ID,    
+    
+        tgt.updated_by = src.updated_by,    
+        tgt.updated_at = GETDATE()    
+    FROM SOERPLineItems tgt    
+    JOIN @SOLines src    
+        ON tgt.SOERPLineItemId = src.SOERPLineItemId;    
+    
+    ------------------------------------------------------------    
+    -- 3. INSERT    
+    ------------------------------------------------------------    
+    INSERT INTO SOERPLineItems    
+    (    
+        SOERPLineItemId, SOERPHeaderId, LINE_NUM, SHIPMENT_NUM,    
+        ITEM_CODE, ITEM_ID, ITEM_DESC, ITEM_CATEGORY, HSN_SAC_CODE,    
+        SERIAL_NUMBER_CONTROL, LOT_CONTROL,    
+        ORDERED_QTY, SHIPPED_QTY, CANCELLED_QTY, FULFILLED_QTY,    
+        UOM, SECONDARY_UOM,    
+        UNIT_LIST_PRICE, UNIT_SELLING_PRICE, DISCOUNT_PERCENT, DISCOUNT_AMOUNT,    
+        LINE_AMOUNT, LINE_TAX_AMOUNT,    
+        REQUEST_DATE, PROMISE_DATE, SCHEDULE_SHIP_DATE, ACTUAL_SHIP_DATE,    
+        LINE_STATUS, BACKORDER_FLAG, DROP_SHIP_FLAG, SHIPPABLE_FLAG, INVOICEABLE_FLAG,    
+        TAX_RATE, CGST_RATE, SGST_RATE, IGST_RATE, CESS_RATE,    
+        GST_EXEMPTION_FLAG, PLACE_OF_SUPPLY, EXPORT_FLAG,    
+        WAREHOUSE_ID, WAREHOUSE_CODE, SUBINVENTORY, RESERVATION_STATUS,    
+        ITEM_TYPE_CODE, LINE_TYPE_ID,    
+        SHIP_FROM_ORG_ID, SHIP_FROM_LOCATION, SHIP_FROM_COUNTRY,    
+        SHIP_TO_ORG_ID, SHIP_TO_LOCATION, SHIP_TO_ADDRESS, SHIP_TO_COUNTRY,    
+        LINE_TYPE, LINE_SERVICE_TYPE, LINE_TRANSACTION_TYPE, LINE_TAX_TREATMENT,    
+        REQUIRES_EXPORT_DOCS, REQUIRES_IC_DOCS, REQUIRES_SHIPPING_DOCS,    
+        SERVICE_DURATION, SERVICE_START_DATE, SERVICE_END_DATE,    
+        SERVICE_REFERENCE_TYPE, SERVICE_REFERENCE_ID,    
+        created_by, created_at, updated_by, updated_at    
+    )    
+    SELECT    
+        ISNULL(src.SOERPLineItemId, CONVERT(VARCHAR(36), NEWID())),    
+        src.SOERPHeaderId,    
+        src.LINE_NUM,    
+        ISNULL(src.SHIPMENT_NUM,1),    
+    
+        src.ITEM_CODE, src.ITEM_ID, src.ITEM_DESC, src.ITEM_CATEGORY, src.HSN_SAC_CODE,    
+        src.SERIAL_NUMBER_CONTROL, src.LOT_CONTROL,    
+        src.ORDERED_QTY, src.SHIPPED_QTY, src.CANCELLED_QTY, src.FULFILLED_QTY,    
+        src.UOM, src.SECONDARY_UOM,    
+        src.UNIT_LIST_PRICE, src.UNIT_SELLING_PRICE, src.DISCOUNT_PERCENT, src.DISCOUNT_AMOUNT,    
+        src.LINE_AMOUNT, src.LINE_TAX_AMOUNT,    
+        src.REQUEST_DATE, src.PROMISE_DATE, src.SCHEDULE_SHIP_DATE, src.ACTUAL_SHIP_DATE,    
+        src.LINE_STATUS, src.BACKORDER_FLAG, src.DROP_SHIP_FLAG, src.SHIPPABLE_FLAG, src.INVOICEABLE_FLAG,    
+        src.TAX_RATE, src.CGST_RATE, src.SGST_RATE, src.IGST_RATE, src.CESS_RATE,    
+        src.GST_EXEMPTION_FLAG, src.PLACE_OF_SUPPLY, src.EXPORT_FLAG,    
+        src.WAREHOUSE_ID, src.WAREHOUSE_CODE, src.SUBINVENTORY, src.RESERVATION_STATUS,    
+        src.ITEM_TYPE_CODE, src.LINE_TYPE_ID,    
+        src.SHIP_FROM_ORG_ID, src.SHIP_FROM_LOCATION, src.SHIP_FROM_COUNTRY,    
+        src.SHIP_TO_ORG_ID, src.SHIP_TO_LOCATION, src.SHIP_TO_ADDRESS, src.SHIP_TO_COUNTRY,    
+        src.LINE_TYPE, src.LINE_SERVICE_TYPE, src.LINE_TRANSACTION_TYPE, src.LINE_TAX_TREATMENT,    
+        src.REQUIRES_EXPORT_DOCS, src.REQUIRES_IC_DOCS, src.REQUIRES_SHIPPING_DOCS,    
+        src.SERVICE_DURATION, src.SERVICE_START_DATE, src.SERVICE_END_DATE,    
+        src.SERVICE_REFERENCE_TYPE, src.SERVICE_REFERENCE_ID,    
+        src.created_by, ISNULL(src.created_at,GETDATE()), src.updated_by, src.updated_at    
+    FROM @SOLines src    
+    WHERE NOT EXISTS (    
+        SELECT 1 FROM SOERPLineItems tgt WHERE tgt.SOERPLineItemId = src.SOERPLineItemId    
+    );    
+    
+    ------------------------------------------------------------    
+    -- Logging    
+    ------------------------------------------------------------    
+    DECLARE @SO_Number VARCHAR(50);    
+    
+    SELECT TOP 1 @SO_Number = SEH.SO_NUMBER    
+    FROM SOERPHeader SEH    
+    JOIN @SOLines SL ON SL.SOERPHeaderId = SEH.SOERPHeaderId;    
+    
+    INSERT INTO POJsonfromERP    
+    SELECT CONCAT('SO-LINE-ITEMS-', @SO_Number), @JsonData, GETDATE();    
+    
+    SELECT 'SUCCESS' AS Status, 'Line items upserted successfully' AS Message;    
+    
+END 

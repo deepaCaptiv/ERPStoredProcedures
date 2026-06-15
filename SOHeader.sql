@@ -6,7 +6,8 @@ BEGIN
  INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Insert',     @JsonData,     GETDATE() );  
     
     
-    
+     
+
 DECLARE @SO TABLE    
 (    
     SOERPHeaderId VARCHAR(36),    
