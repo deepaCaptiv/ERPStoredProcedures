@@ -1,9 +1,12 @@
+  
+   
 CREATE   PROCEDURE [dbo].[Insert_ERPTax_FromJson]  
     @JsonData NVARCHAR(MAX)  
 AS  
 BEGIN  
     SET NOCOUNT ON;  
   
+   
   insert into POJsonfromERP  
   values('tax',@JsonData,getdate())  
   
@@ -53,7 +56,20 @@ BEGIN
    POERPLineItemId VARCHAR(36)  
         )  
   
-     
+  DECLARE @POERPHeaderId VARCHAR(36)  
+  
+  SELECT TOP 1 @POERPHeaderId=POERPHeaderId   
+  FROM @TempTax  
+  
+  IF EXISTS ( SELECT 1 FROM Vertiv..ERPTax WITH(NOLOCK) WHERE POERPHeaderId=@POERPHeaderId)  
+  
+  BEGIN  
+  
+   INSERT INTO Vertiv..ERPTaxHistory  
+   SELECT NEWID(),GETDATE(),TAR.*  
+   FROM  Vertiv..ERPTax TAR WITH(NOLOCK)  
+   WHERE TAR.POERPHeaderId=@POERPHeaderId  
+  
    --Update Existing tax details  
    UPDATE TAR  
    SET   TAR.ERPTaxRate = SRC.ERPTaxRate,  
@@ -65,6 +81,8 @@ BEGIN
    JOIN  @TempTax SRC  
    ON  TAR.ERPTaxTransactionId=SRC.ERPTaxTransactionId  
   
+   END  
+     
    INSERT INTO Vertiv..ERPTax  
    (  
   ERPTaxTransactionId,  
@@ -90,8 +108,19 @@ BEGIN
  LEFT JOIN Vertiv..ERPTax T  
  ON  TT.ERPTaxTransactionId=T.ERPTaxTransactionId  
  WHERE T.ERPTaxTransactionId IS NULL  
-     
-   
   
-    PRINT 'Insert/Update completed';  
+ --INSERT INTO @ERPTaxHistory  
+ --   SELECT NEWID(),GETDATE(),T.* FROM Vertiv..ERPTax T WITH(NOLOCK)  
+ --LEFT JOIN @TempTax TT  
+ --ON  TT.ERPTaxTransactionId=T.ERPTaxTransactionId  
+ --WHERE T.POERPHeaderId =@POERPHeaderId  
+ --AND  TT.ERPTaxTransactionId IS NULL  
+   
+ Delete T FROM  Vertiv..ERPTax T   
+ Where T.POERPHeaderId =@POERPHeaderId   
+ AND T.ERPTaxTransactionId NOT IN ( SELECT ERPTaxTransactionId FROM @TempTax)  
+  
+  
+    PRINT 'Insert/Update/Delete completed';  
+  
 END  

@@ -1,9 +1,11 @@
+  
 CREATE   PROCEDURE [dbo].[Insert_POERPHeader_FromJson]  
     @JsonData NVARCHAR(MAX)  
 AS  
 BEGIN  
     SET NOCOUNT ON;  
   
+   
    
     BEGIN TRY  
   
@@ -15,8 +17,8 @@ BEGIN
         END;  
   
   --Capture Raw json data  
-  insert into POJsonfromERP  
-  values('Before insert' ,@JsonData,getdate())  
+  INSERT INTO POJsonfromERP  
+  VALUES('Before insert' ,@JsonData,getdate())  
   
  DECLARE @TempPOHeaderDetails TABLE  
  (  
@@ -49,7 +51,8 @@ BEGIN
         POUpdatedOn DATETIME,  
         DocTypeId VARCHAR(36),  
         PO_STATUS VARCHAR(50)  
-  )  
+  );  
+  
   INSERT INTO @TempPOHeaderDetails  
   (  
    POERPHeaderId ,            
@@ -143,9 +146,30 @@ BEGIN
                 POUpdatedOn DATETIME,  
                 DocTypeId VARCHAR(36),  
                 PO_STATUS VARCHAR(50)  
-    )  
-       
+    );  
+  
+     DECLARE @POERPHeaderId VARCHAR(36)  
+  
+  SELECT TOP 1 @POERPHeaderId=POERPHeaderId   
+  FROM @TempPOHeaderDetails  
+  
+ IF EXISTS (SELECT 1 FROM Vertiv..POERPHeader TAR WITH(NOLOCK) WHERE POERPHeaderId=@POERPHeaderId)  
+ BEGIN  
      
+   INSERT INTO POERPHeaderHistory  
+   (  
+   POERPHeaderHistoryId,RecordedOn,POERPHeaderId,DocId,PO_NUMBER,PO_DATE,PO_Type,PO_SubType,REVISION,  
+   VENDOR_NAME,VENDOR_ADDRESS,VENDOR_GSTIN,VENDOR_CONTACT,VENDOR_PHONE,VENDOR_EMAIL,BUYER_ORG,BUYER_ADDRESS,  
+   BUYER_GSTIN,BUYER_NAME,SHIP_TO_LOCATION,SHIP_TO_ADDRESS,BILL_TO_LOCATION,PAYMENT_TERMS,CURRENCY,SUBTOTAL,  
+   TOTAL_TAX,GRAND_TOTAL,INSTRUCTIONS,POUpdatedBy,POUpdatedOn,DocTypeId,PO_STATUS  
+   )  
+   SELECT NEWID(),GETDATE(),POERPHeaderId,DocId,PO_NUMBER,PO_DATE,PO_Type,PO_SubType,REVISION,  
+    VENDOR_NAME,VENDOR_ADDRESS,VENDOR_GSTIN,VENDOR_CONTACT,VENDOR_PHONE,VENDOR_EMAIL,BUYER_ORG,BUYER_ADDRESS,  
+    BUYER_GSTIN,BUYER_NAME,SHIP_TO_LOCATION,SHIP_TO_ADDRESS,BILL_TO_LOCATION,PAYMENT_TERMS,CURRENCY,SUBTOTAL,  
+    TOTAL_TAX,GRAND_TOTAL,INSTRUCTIONS,POUpdatedBy,POUpdatedOn,DocTypeId,PO_STATUS   
+   FROM Vertiv..POERPHeader TAR WITH(NOLOCK)   
+   WHERE POERPHeaderId=@POERPHeaderId  
+  
    --Update Existing data  
    UPDATE TAR  
    SET                
@@ -181,6 +205,7 @@ BEGIN
   JOIN @TempPOHeaderDetails SRC  
   ON  TAR.POERPHeaderId=SRC.POERPHeaderId  
   
+ END  
   --Insert new PO  
   INSERT INTO Vertiv..POERPHeader  
   (  
@@ -256,7 +281,7 @@ BEGIN
   FROM @TempPOHeaderDetails;  
   
     
-  insert into POJsonfromERP  
+  INSERT INTO POJsonfromERP  
   SELECT PO_NUMBER  ,@JsonData,getdate()  
   FROM @TempPOHeaderDetails  
   

@@ -38,7 +38,7 @@ BEGIN
   )  
   INSERT INTO @TempLineItems  
   (  
-    POERPLineItemId,    
+   POERPLineItemId,    
             LINE_NUM,    
             ITEM_CODE,    
             ITEM_DESC,    
@@ -114,8 +114,12 @@ BEGIN
             SHIP_TO_COUNTRY VARCHAR(100),    
             STOCK_TRANSFER_FLAG BIT,    
             HIGH_SEA_SALES_FLAG BIT    
-        )    
-      
+        );  
+  
+  DECLARE @HeaderId VARCHAR(50)   SELECT top 1 @HeaderId=POERPHeaderId   FROM @TempLineItems       IF EXISTS(SELECT  1 FROM Vertiv..POERPLineItems  WITH(NOLOCK)    WHERE POERPHEADERiD=@HeaderId )   BEGIN  
+  
+  INSERT INTO POERPLineItemsHistory   SELECT NEWID(),GETDATE(),*   FROM Vertiv..POERPLineItems  WITH(NOLOCK)   WHERE POERPHEADERiD=@HeaderId  
+  
   --Update Existing LIne Items  
    UPDATE TAR  
    SET    
@@ -124,7 +128,7 @@ BEGIN
             ITEM_DESC = SRC.ITEM_DESC,    
             HSN_SAC = SRC.HSN_SAC,    
             QTY = SRC.QTY,    
-        UOM = SRC.UOM,    
+            UOM = SRC.UOM,    
             UNIT_PRICE = SRC.UNIT_PRICE,    
             LINE_AMOUNT = SRC.LINE_AMOUNT,    
             DELIVERY_DATE = SRC.DELIVERY_DATE,    
@@ -146,6 +150,7 @@ BEGIN
  JOIN Vertiv..POERPLineItems TAR   
  ON  SRC.POERPLineItemId=TAR.POERPLineItemId  
   
+ END  
  --Insert new Line Items  
   
         INSERT  INTO Vertiv..POERPLineItems  
@@ -200,11 +205,28 @@ BEGIN
             SRC.STOCK_TRANSFER_FLAG,    
             SRC.HIGH_SEA_SALES_FLAG   
   FROM @TempLineItems SRC  
-  LEFT JOIN Vertiv..POERPLineItems PLI  
+  LEFT JOIN Vertiv..POERPLineItems PLI WITH(NOLOCK)  
   ON  SRC.POERPLineItemId=pli.POERPLineItemId  
   WHERE PLI.POERPLineItemId IS NULL  
   
-        
-  insert into POJsonfromERP    
-  values('lineitem',@JsonData,getdate())    
+  --INSERT INTO @POERPLineItemsHistory     
+  --SELECT NEWID(),GETDATE(),PLI.* FROM Vertiv..POERPLineItems PLI WITH(NOLOCK)  
+  --LEFT JOIN @TempLineItems SRC  
+  --ON  SRC.POERPLineItemId=PLI.POERPLineItemId  
+  --WHERE PLI.POERPHeaderId IN ( SELECT DISTINCT POERPHeaderId FROM @TempLineItems)  
+  --  AND SRC.POERPLineItemId IS NULL  
+  
+  ----Unmatched LineItem Moved to history  
+  --INSERT INTO dbo.POERPLineItemsHistory   
+  --SELECT * FROM @POERPLineItemsHistory  
+  
+  DELETE PLI FROM Vertiv..POERPLineItems PLI    
+  WHERE POERPHEADERiD=@HeaderId AND  
+  PLI.POERPLineItemId NOT IN (Select POERPLineItemId FROM @TempLineItems )  
+   
+  
+      --Include delete to remove POerplineitems  
+   INSERT INTO POJsonfromERP    
+   VALUES('lineitem',@JsonData,getdate())    
+  
 END 
