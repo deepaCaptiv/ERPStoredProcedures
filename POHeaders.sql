@@ -17,8 +17,8 @@ BEGIN
         END;  
   
   --Capture Raw json data  
-  INSERT INTO POJsonfromERP  
-  VALUES('Before insert' ,@JsonData,getdate())  
+  --INSERT INTO POJsonfromERP  
+  --VALUES('Before insert' ,@JsonData,getdate())  
   
  DECLARE @TempPOHeaderDetails TABLE  
  (  
@@ -281,9 +281,9 @@ BEGIN
   FROM @TempPOHeaderDetails;  
   
     
-  INSERT INTO POJsonfromERP  
-  SELECT PO_NUMBER  ,@JsonData,getdate()  
-  FROM @TempPOHeaderDetails  
+  --INSERT INTO POJsonfromERP  
+  --SELECT PO_NUMBER  ,@JsonData,getdate()  
+  --FROM @TempPOHeaderDetails  
   
     END TRY  
     BEGIN CATCH  

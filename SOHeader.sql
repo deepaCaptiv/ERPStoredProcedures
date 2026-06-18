@@ -3,7 +3,7 @@
 AS    
 BEGIN    
    
- INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Insert',     @JsonData,     GETDATE() );  
+ --INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Insert',     @JsonData,     GETDATE() );  
     
     
      
@@ -276,8 +276,8 @@ WHERE NOT EXISTS (
     WHERE tgt.SOERPHeaderId = src.SOERPHeaderId    
 );    
     
-INSERT INTO POJsonfromERP    
-SELECT SO_NUMBER, @JsonData, GETDATE() FROM @SO;    
+--INSERT INTO POJsonfromERP    
+--SELECT SO_NUMBER, @JsonData, GETDATE() FROM @SO;    
     
     
 SELECT SO_NUMBER FROM @SO;    

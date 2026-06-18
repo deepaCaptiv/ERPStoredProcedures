@@ -15,8 +15,8 @@ BEGIN
             RETURN;    
         END;    
     
-        INSERT INTO pojsonfromerp    
-        VALUES ('asn before insert', @jsondata, GETDATE());    
+        --INSERT INTO pojsonfromerp    
+        --VALUES ('asn before insert', @jsondata, GETDATE());    
     
         DECLARE @tempasnheader TABLE    
         (    
@@ -283,9 +283,9 @@ BEGIN
         SELECT ASNNubmer as asn_number    
         FROM @tempasnheader;    
     
-        INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)    
-        SELECT ASNNubmer, @jsondata, GETDATE()    
-        FROM @tempasnheader;    
+        --INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)    
+        --SELECT ASNNubmer, @jsondata, GETDATE()    
+        --FROM @tempasnheader;    
     
     END TRY    
     

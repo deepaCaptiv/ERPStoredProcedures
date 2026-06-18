@@ -21,8 +21,8 @@ BEGIN
         -------------------------------------------------------------        
         -- LOG INPUT        
         -------------------------------------------------------------        
-        INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)        
-        VALUES ('PaymentAdvice Before Insert', @jsondata, GETDATE());        
+        --INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)        
+        --VALUES ('PaymentAdvice Before Insert', @jsondata, GETDATE());        
         
         -------------------------------------------------------------        
         -- TEMP TABLE        
@@ -388,8 +388,8 @@ BEGIN
         -------------------------------------------------------------        
         SELECT payment_number FROM @tempheader;        
         
-        INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)        
-        VALUES ('PaymentAdvice Completed', @jsondata, GETDATE());        
+        --INSERT INTO pojsonfromerp (ponumber, jsondata, createdat)        
+        --VALUES ('PaymentAdvice Completed', @jsondata, GETDATE());        
         
         COMMIT TRAN;        
         

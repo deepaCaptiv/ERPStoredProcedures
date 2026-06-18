@@ -12,8 +12,8 @@ BEGIN
             RETURN;      
         END;      
        
-        INSERT INTO POJsonfromERP      
-        VALUES ('GRN Before insert', @JsonData, GETDATE());      
+        --INSERT INTO POJsonfromERP      
+        --VALUES ('GRN Before insert', @JsonData, GETDATE());      
     
             
         DECLARE @TempGRNHeader TABLE      
@@ -165,8 +165,8 @@ BEGIN
         SELECT  grn_number  AS GRN_NUMBER ,GETDATE()   
   FROM @TempGRNHeader;      
       
-   INSERT INTO POJsonfromERP (PONUMBER, JsonData, createdat)      
-   OUTPUT INSERTED.PONUMBER, INSERTED.createdat INTO @InsertedGRNs      
+   --INSERT INTO POJsonfromERP (PONUMBER, JsonData, createdat)      
+   --OUTPUT INSERTED.PONUMBER, INSERTED.createdat INTO @InsertedGRNs      
      
     
         SELECT grn_number, @JsonData, GETDATE()      

@@ -11,8 +11,8 @@ BEGIN
             THROW 50001, 'Invalid or NULL JSON passed to SaveGRNLineItemsJson', 1;        
         END        
       
-  INSERT INTO vertiv..POJsonfromERP            
-  VALUES('Before grn insert lineitem',@JsonData,getdate())           
+  --INSERT INTO vertiv..POJsonfromERP            
+  --VALUES('Before grn insert lineitem',@JsonData,getdate())           
                 
           
    DECLARE @TempLineItems TABLE          
@@ -223,7 +223,7 @@ BEGIN
           )  
           
                 
-  INSERT INTO VERTIV..POJsonfromERP            
-  VALUES('GRNlineitem',@JsonData,GETDATE())      
+  --INSERT INTO VERTIV..POJsonfromERP            
+  --VALUES('GRNlineitem',@JsonData,GETDATE())      
     
 END 

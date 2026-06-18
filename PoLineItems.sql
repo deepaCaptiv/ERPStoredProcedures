@@ -5,8 +5,8 @@ BEGIN
     SET NOCOUNT ON;    
     
     
-  insert into POJsonfromERP    
-  values('Before insert lineitem',@JsonData,getdate())   
+  --insert into POJsonfromERP    
+  --values('Before insert lineitem',@JsonData,getdate())   
         
   
    DECLARE @TempLineItems TABLE  
@@ -226,7 +226,7 @@ BEGIN
    
   
       --Include delete to remove POerplineitems  
-   INSERT INTO POJsonfromERP    
-   VALUES('lineitem',@JsonData,getdate())    
+   --INSERT INTO POJsonfromERP    
+   --VALUES('lineitem',@JsonData,getdate())    
   
 END 

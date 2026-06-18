@@ -7,8 +7,8 @@ BEGIN
     SET NOCOUNT ON;  
   
    
-  insert into POJsonfromERP  
-  values('tax',@JsonData,getdate())  
+  --insert into POJsonfromERP  
+  --values('tax',@JsonData,getdate())  
   
  DECLARE @TempTax TABLE  
  (  

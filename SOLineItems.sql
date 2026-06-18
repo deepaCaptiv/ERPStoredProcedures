@@ -10,7 +10,7 @@ BEGIN
     -- 1. Parse JSON into table variable    
     ------------------------------------------------------------    
    
- INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Line Items Insert',     @JsonData,     GETDATE() );  
+ --INSERT INTO POJsonfromERP (     PONUMBER,     JsonData,     createdat ) VALUES (     'Before SO Line Items Insert',     @JsonData,     GETDATE() );  
     
     
     DECLARE @SOLines TABLE    
@@ -349,8 +349,8 @@ BEGIN
     FROM SOERPHeader SEH    
     JOIN @SOLines SL ON SL.SOERPHeaderId = SEH.SOERPHeaderId;    
     
-    INSERT INTO POJsonfromERP    
-    SELECT CONCAT('SO-LINE-ITEMS-', @SO_Number), @JsonData, GETDATE();    
+    --INSERT INTO POJsonfromERP    
+    --SELECT CONCAT('SO-LINE-ITEMS-', @SO_Number), @JsonData, GETDATE();    
     
     SELECT 'SUCCESS' AS Status, 'Line items upserted successfully' AS Message;    
     

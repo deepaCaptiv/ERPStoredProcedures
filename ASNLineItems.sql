@@ -6,8 +6,8 @@ BEGIN
     
       
     
-  INSERT INTO vertiv..pojsonfromerp    
-        VALUES ('before asn line insert', @jsondata, GETDATE());    
+  --INSERT INTO vertiv..pojsonfromerp    
+  --      VALUES ('before asn line insert', @jsondata, GETDATE());    
     
         
    IF @jsondata IS NULL OR ISJSON(@jsondata) = 0    
@@ -164,8 +164,8 @@ BEGIN
          )  
   
   
-  INSERT INTO vertiv..pojsonfromerp    
-        VALUES ('After asn line insert', @jsondata, GETDATE());    
+  --INSERT INTO vertiv..pojsonfromerp    
+  --      VALUES ('After asn line insert', @jsondata, GETDATE());    
   
     END TRY    
     BEGIN CATCH    
